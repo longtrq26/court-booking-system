@@ -3,17 +3,22 @@ FROM node:22-alpine AS builder
 
 WORKDIR /usr/src/app
 
-# Cài đặt các công cụ build cơ bản cho các package cần biên dịch (như bcrypt, sharp)
+# Cài đặt các công cụ build cơ bản
 RUN apk add --no-cache python3 make g++
 
-# Copy file manifest trước để tối ưu Docker cache lớp node_modules
+# Copy root manifest files để tận dụng Docker cache
 COPY package.json package-lock.json ./
-RUN npm ci
+# Copy server package.json để npm có thể nhận diện workspace
+COPY server/package.json ./server/
 
-# Copy toàn bộ mã nguồn
-COPY . .
+# Cài đặt dependencies cho workspace server
+RUN npm ci -w server
+
+# Copy mã nguồn server
+COPY server ./server
 
 # Biên dịch TypeScript sang JavaScript
+WORKDIR /usr/src/app/server
 RUN npm run build
 
 
@@ -22,23 +27,25 @@ FROM node:22-alpine AS production
 
 WORKDIR /usr/src/app
 
-# Thiết lập môi trường production để tối ưu hóa runtime
+# Thiết lập môi trường production
 ENV NODE_ENV=production
 
-# Copy file manifest để cài đặt dependencies cho runtime
+# Copy root manifest files
 COPY package.json package-lock.json ./
+COPY server/package.json ./server/
 
-# Chỉ cài đặt các dependencies cần thiết cho bản build, xóa cache để giảm kích thước ảnh
-RUN npm ci --omit=dev && npm cache clean --force
+# Chỉ cài đặt dependencies cho runtime của workspace server
+RUN npm ci -w server --omit=dev && npm cache clean --force
 
-# Copy thư mục build từ giai đoạn builder
-COPY --from=builder /usr/src/app/dist ./dist
+# Copy thư mục build và các file cần thiết
+COPY --from=builder /usr/src/app/server/dist ./server/dist
 
-# Chạy ứng dụng với user non-root để đảm bảo bảo mật
+# Chạy ứng dụng với user non-root
 USER node
 
-# Port mà server sẽ lắng nghe
+# Port server lắng nghe
 EXPOSE 3001
 
-# Lệnh khởi chạy ứng dụng
+# Lệnh khởi chạy ứng dụng (giả định build ra server/dist/main.js)
+WORKDIR /usr/src/app/server
 CMD ["node", "dist/main.js"]
