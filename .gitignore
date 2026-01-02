@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+.next/
+server/dist/
+client/.next/
+out/
+build/
+
+# Environment files
+.env
+.env.*
+!.env.example
+server/.env
+client/.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+
+# Temporary files
+.tmp/
+.cache/
