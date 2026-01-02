@@ -1,57 +1,65 @@
 # Giai đoạn Dependencies
 FROM node:22-alpine AS deps
 
-# libc6-compat cần thiết cho Next.js (SWC) khi chạy trên Alpine Linux
+# libc6-compat cần cho Next.js (SWC) trên Alpine
 RUN apk add --no-cache libc6-compat
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copy file manifest để cài đặt và cache dependencies
+# Copy root manifest files
 COPY package.json package-lock.json ./
-RUN npm ci
+# Copy client package.json cho workspace
+COPY client/package.json ./client/
+
+# Cài đặt dependencies cho workspace client
+RUN npm ci -w client
 
 
 # Giai đoạn Build
 FROM node:22-alpine AS builder
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Sử dụng lại node_modules từ giai đoạn deps
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Copy root manifests và node_modules từ deps
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY --from=deps /usr/src/app/client/node_modules ./client/node_modules
 
-# Tắt telemetry của Next.js để tăng tốc độ build
+# Copy mã nguồn client
+COPY client ./client
+
+# Tắt telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Nếu cần sử dụng biến client-side (NEXT_PUBLIC_*),
-# hãy khai báo ARG và ENV ở đây để "bake" vào bản build.
-# ARG NEXT_PUBLIC_API_URL
-# ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-
+# Build client
+WORKDIR /usr/src/app/client
 RUN npm run build
 
 
 # Giai đoạn Chạy (Runner)
 FROM node:22-alpine AS runner
-WORKDIR /app
+WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Tạo nhóm và người dùng non-root để tăng cường bảo mật
+# Bảo mật với user non-root
 RUN addgroup --system --gid 1001 nodejs \
  && adduser --system --uid 1001 nextjs
 
-# Copy các tệp tĩnh (public assets)
-COPY --from=builder /app/public ./public
+# Copy static assets
+COPY --from=builder /usr/src/app/client/public ./client/public
 
-# Cấu hình "standalone" giúp tối ưu hóa kích thước ảnh bằng cách chỉ copy những file thực sự cần thiết
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copy standalone build output
+COPY --from=builder --chown=nextjs:nodejs /usr/src/app/client/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /usr/src/app/client/.next/static ./client/.next/static
 
 USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
 
-# Lệnh khởi chạy server Next.js ở chế độ standalone
+# Khởi chạy Next.js standalone
+# Lưu ý: standalone server chạy từ thư mục gốc của nó
+WORKDIR /usr/src/app/client
 CMD ["node", "server.js"]
