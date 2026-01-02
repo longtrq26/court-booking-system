@@ -1,0 +1,19 @@
+{
+  "name": "court-booking-system",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n SERVER,CLIENT \"npm run start:dev -w server\" \"npm run dev -w client\"",
+    "build:client": "npm run build -w client",
+    "build:server": "npm run build -w server",
+    "build": "npm run build:client && npm run build:server",
+    "test": "npm run test -ws --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

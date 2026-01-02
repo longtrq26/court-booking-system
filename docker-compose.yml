@@ -1,0 +1,67 @@
+services:
+  # Backend Server - Ứng dụng NestJS
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env.server
+      - .env.postgres
+    depends_on:
+      postgres:
+        condition: service_healthy # Chỉ khởi động sau khi database đã sẵn sàng
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Frontend Client - Ứng dụng Next.js
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.client
+    depends_on:
+      - server
+    networks:
+      - app-network
+
+  # Database - PostgreSQL 17
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5433:5432" # Map port 5433 máy host vào 5432 của container
+    env_file:
+      - .env.postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Database Admin Interface - pgAdmin4
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    env_file:
+      - .env.pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
