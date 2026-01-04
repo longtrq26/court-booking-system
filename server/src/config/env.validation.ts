@@ -63,14 +63,14 @@ export const envValidationSchema = z
           message: 'Production CLIENT_URL cannot be localhost',
         });
       }
-    }
 
-    if (env.SERVER_URL.includes('localhost')) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['SERVER_URL'],
-        message: 'Production SERVER_URL cannot be localhost',
-      });
+      if (env.SERVER_URL.includes('localhost')) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['SERVER_URL'],
+          message: 'Production SERVER_URL cannot be localhost',
+        });
+      }
     }
   });
 

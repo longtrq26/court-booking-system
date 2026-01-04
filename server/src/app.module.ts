@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { envValidationSchema } from './config/env.validation';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccessTokenGuard } from './common/guards/access-token.guard';
+import { RolesGuard } from './common/guards/roles.guard';
+import { envValidationSchema } from './config/env.validation';
+import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -46,13 +50,25 @@ import { UserModule } from './modules/user/user.module';
       }),
     }),
 
+    AuthModule,
     UserModule,
+    MailModule,
   ],
   providers: [
     // Throttler
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    // Auth
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
+    // Roles
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

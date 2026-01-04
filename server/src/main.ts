@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 async function bootstrap() {
   // Logger
@@ -39,6 +41,12 @@ async function bootstrap() {
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
     credentials: true,
   });
+
+  // Set global cookie parser
+  app.use(cookieParser());
+
+  // Set global helmet
+  app.use(helmet());
 
   // Set global swagger
   if (configService.getOrThrow<string>('NODE_ENV') !== 'production') {
