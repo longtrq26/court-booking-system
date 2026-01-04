@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { Column, Entity, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { UserRole } from '../../../common/enums/user-role.enum';
+import { UserRole } from '../../../common/enums/user/user-role.enum';
 
 @Entity('users')
 @Index(['email', 'deletedAt'])

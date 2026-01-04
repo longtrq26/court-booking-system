@@ -13,7 +13,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { UserResponseDto } from './dtos/response-user.dto';
+import { UserResponseDto } from './dtos/user-response.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserService } from './user.service';
 

@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRole } from 'src/common/enums/user/user-role.enum';
 import { Tokens } from 'src/common/interfaces/jwt-payload.interface';
 import { MailService } from '../mail/mail.service';
 import { UserService } from '../user/user.service';

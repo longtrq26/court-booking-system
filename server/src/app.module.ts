@@ -9,6 +9,8 @@ import { envValidationSchema } from './config/env.validation';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { MailModule } from './modules/mail/mail.module';
+import { CourtModule } from './modules/court/court.module';
+import { BookingModule } from './modules/booking/booking.module';
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { MailModule } from './modules/mail/mail.module';
     AuthModule,
     UserModule,
     MailModule,
+    CourtModule,
+    BookingModule,
   ],
   providers: [
     // Throttler

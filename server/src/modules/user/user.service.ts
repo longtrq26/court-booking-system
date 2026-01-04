@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRole } from 'src/common/enums/user/user-role.enum';
 import { IsNull, Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
