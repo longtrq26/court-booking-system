@@ -46,6 +46,6 @@ USER node
 # Port server lắng nghe
 EXPOSE 3001
 
-# Lệnh khởi chạy ứng dụng (giả định build ra server/dist/main.js)
+# Lệnh khởi chạy ứng dụng (build ra server/dist/src/main.js)
 WORKDIR /usr/src/app/server
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]

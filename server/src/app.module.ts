@@ -11,6 +11,8 @@ import { UserModule } from './modules/user/user.module';
 import { MailModule } from './modules/mail/mail.module';
 import { CourtModule } from './modules/court/court.module';
 import { BookingModule } from './modules/booking/booking.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -57,6 +59,8 @@ import { BookingModule } from './modules/booking/booking.module';
     MailModule,
     CourtModule,
     BookingModule,
+    PaymentModule,
+    NotificationModule,
   ],
   providers: [
     // Throttler
